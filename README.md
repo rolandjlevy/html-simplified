@@ -1,71 +1,89 @@
-# HTML simplified
+# Scripts
 
-Clean HTML files by removing scripts, styles, SVGs, stylesheet links, comments, and tracking code.
+Utility scripts for HTML processing and link extraction.
 
-## Usage
+## Available Scripts
 
+### 1. clean-html.js
+
+Clean HTML files by removing scripts, styles, SVGs, stylesheet links, comments, and tracking code while preserving semantic structure.
+
+**Usage:**
 ```bash
-# Clean a file (creates input.cleaned.html)
-node scripts/clean-html.js input.html
-
-# Specify output file
-node scripts/clean-html.js input.html output.html
-
-# Output to stdout (for piping)
-node scripts/clean-html.js input.html -
-
-# Make executable and run directly
-chmod +x scripts/clean-html.js
+node scripts/clean-html.js input.html [output.html]
 ./scripts/clean-html.js input.html
 ```
 
-## What it removes
+**What it removes:**
+- `<script>...</script>` tags and contents
+- `<style>...</style>` tags and contents
+- `<svg>...</svg>` tags and contents
+- `<link rel="stylesheet">` tags
+- HTML comments `<!-- -->`
+- `<noscript>` blocks with tracking code
 
-- `<script>...</script>` tags and their contents
-- `<style>...</style>` tags and their contents
-- `<svg>...</svg>` tags and their contents
-- `<link rel="stylesheet" ...>` tags
-- HTML comments `<!-- ... -->`
-- `<noscript>` tags containing styles, scripts, or tracking code
-
-## What it keeps
-
-- All semantic HTML structure (html, body, header, main, section, article, footer)
+**What it keeps:**
+- Semantic HTML structure
 - Content elements (headings, paragraphs, lists, tables, forms)
-- Images and anchors
-- Important attributes (href, src, alt, id, class, aria-*)
+- Images, anchors, and important attributes
 
-## Examples
+[Full documentation](./README-clean-html.md)
+
+---
+
+### 2. extract-links.js
+
+Extract only `<a href>` tags and plain text from HTML, removing all other markup.
+
+**Usage:**
+```bash
+node scripts/extract-links.js input.html [output.txt]
+./scripts/extract-links.js input.html
+```
+
+**What it does:**
+- Removes all HTML tags except `<a href>` anchors
+- Preserves anchor tags with all attributes
+- Keeps plain text content
+- Decodes HTML entities
+- Cleans excessive whitespace
+
+**Output format:**
+```
+Plain text content...
+<a href="https://example.com/page">Link Text</a>
+More plain text...
+```
+
+[Full documentation](./README-extract-links.md)
+
+---
+
+## Quick Examples
 
 ```bash
-# Clean jammy.co.uk backup
-node scripts/clean-html.js src/components/OrderSuccess/jammy.co.uk.bak
+# Clean a bloated HTML file
+node scripts/clean-html.js page.html page-cleaned.html
 
-# Clean and pipe to another tool
-node scripts/clean-html.js input.html - | grep -i "<a href"
+# Extract only links and text
+node scripts/extract-links.js page.html page-links.txt
 
-# Clean multiple files
-for file in *.html; do
-  node scripts/clean-html.js "$file" "cleaned-$file"
-done
+# Chain operations: clean first, then extract links
+node scripts/clean-html.js input.html - | node scripts/extract-links.js - output.txt
+
+# Count links in a file
+node scripts/extract-links.js page.html - | grep -c "<a href"
 ```
 
-## Output
+## Installation
 
-The script reports:
-- Size reduction percentage
-- Count of removed elements (scripts, styles, SVGs, stylesheets, comments)
-- Input/output file paths
-
-Example output:
+Make scripts executable:
+```bash
+chmod +x scripts/*.js
 ```
-Reading: jammy.co.uk.bak
-Wrote: jammy-cleaned.html
-Size: 415780 → 335285 bytes (19.4% reduction)
-Removed:
-  - <script> tags: 130
-  - <style> tags: 1
-  - <svg> tags: 15
-  - <link rel="stylesheet">: 1
-  - HTML comments: 14
+
+Then run directly:
+```bash
+./scripts/clean-html.js input.html
+./scripts/extract-links.js input.html
 ```
